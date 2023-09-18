@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Schedule</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>School Schedule</h1>
+    
+        <!-- Iterate over grades -->
+        {% for grade, grade_data in schedules.items() %}
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ grade|replace(' ', '_') }}">
+            Grade {{ grade }}
+        </button>
+
+        <!-- Rest of your HTML template -->
+    
+        <div id="{{ grade|replace(' ', '_') }}" class="collapse">
+            <!-- Iterate over classrooms for the current grade -->
+            {% for classroom, schedule in grade_data.items() %}
+            <h2>Classroom: {{ classroom }}</h2>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Time Slot</th>
+                    <th>Sunday</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Iterate over time slots for the current classroom -->
+                {% for entry in schedule %}
+                    <tr>
+                        <td>{{ entry['time_slot'] }}</td>
+                        <td>{{ entry['schedule']['Sunday'] }}</td>
+                        <td>{{ entry['schedule']['Monday'] }}</td>
+                        <td>{{ entry['schedule']['Tuesday'] }}</td>
+                        <td>{{ entry['schedule']['Wednesday'] }}</td>
+                        <td>{{ entry['schedule']['Thursday'] }}</td>
+                        <td>{{ entry['schedule']['Friday'] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
