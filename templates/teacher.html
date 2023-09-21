@@ -5,27 +5,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Website{% endblock %}</title>
+    <title>Teacher Schedules</title>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>School Schedule</h1>
+        <h1>Teacher Schedules</h1>
     
-        <!-- Iterate over grades -->
-        {% for grade, grade_data in schedules.items() %}
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ grade|replace(' ', '_') }}">
-            Grade {{ grade }}
+        <!-- Iterate over teachers -->
+        {% for teacher, schedule in teacher_schedules.items() %}
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ teacher|replace(' ', '_') }}">
+            {{ teacher }}
         </button>
 
         <!-- Rest of your HTML template -->
     
-        <div id="{{ grade|replace(' ', '_') }}" class="collapse">
-            <!-- Iterate over classrooms for the current grade -->
-            {% for classroom, schedule in grade_data.items() %}
-            <h2>Classroom: {{ classroom }}</h2>
+        <div id="{{ teacher|replace(' ', '_') }}" class="collapse">
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -39,7 +36,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <!-- Iterate over time slots for the current classroom -->
+                <!-- Iterate over time slots for the current teacher -->
                 {% for entry in schedule %}
                     <tr>
                         <td>{{ entry['time_slot'] }}</td>
@@ -53,7 +50,6 @@
                 {% endfor %}
                 </tbody>
             </table>
-            {% endfor %}
         </div>
         {% endfor %}
     </div>

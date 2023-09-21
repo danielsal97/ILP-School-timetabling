@@ -1,30 +1,19 @@
-
-from pulp import *
-import matplotlib
-matplotlib.use('Agg')  # Set the Agg backend
-
-from flask import Flask, render_template
+import os
+from flask import Flask, render_template, request, redirect, url_for
+import json
 import matplotlib.pyplot as plt
 import numpy as np
+from pulp import *
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
+teacher_schedules = {}
+schedules_by_day = {}
+schedules = {}
+days = []
 
-@app.route('/')
-def school_schedule():
-
-
-
-# Define the input data
-
-    lectures = {'Math': 2, 'English': 2, 'Science': 2, 'History': 2}
-    classrooms = {'Classroom 1': lectures, 'Classroom 2': lectures}
-    grades = {'A': classrooms, 'B': classrooms}
-    teachers = {'Smith': [100, ['Math', 'History', 'Science'], ['N', 'Friday']],
-                'Johnson': [100, ['English'], ['Friday', 'N']],
-                'Williams': [100, ['Science', 'English'], ['N', 'N']]}
-    time_slots = ['8-9', '9-10', '10-11', '11-12', '12-13', '13-14', '14-15', '15-16', '16-17']
-    days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
-    # Define the problem
+def optimize_with_pulp(data, lectures, classrooms, grades, teachers, time_slots, days):
+     # Define the problem
     prob = LpProblem("School_Scheduling", LpMaximize)
 
     # Define the decision variables
@@ -104,11 +93,6 @@ def school_schedule():
     else:
         print("The problem is feasible. All constraints can be satisfied.")
 
-    # Rest of your code...
-
-
-
-    schedules = {}
 
     for grade in grades:
         schedules[grade] = {}  # Use a dictionary to store schedules for each grade
@@ -127,13 +111,100 @@ def school_schedule():
                                 entry['schedule'][day] = f"{teacher}/{lecture}"
 
                 schedules[grade][classroom].append(entry)
+    
 
-# Now you have schedules for each grade and each classroom
+
+    # Iterate over teachers
+    for teacher in teachers:
+        teacher_schedules[teacher] = []  # Use a list to store schedules for each teacher
+
+        for time_slot in time_slots:
+            entry = {'time_slot': time_slot, 'schedule': {day: '' for day in days}}
+
+            for day in days:
+                for lecture in lectures:
+                    for classroom in classrooms:
+                        for grade in grades:
+                            if x[(teacher, lecture, time_slot, day, classroom, grade)].varValue == 1:
+                                entry['schedule'][day] = f"{lecture}/{classroom}/{grade}"
+
+            teacher_schedules[teacher].append(entry)
+
+    
+
+    # Iterate over days
+    for day in days:
+        schedules_by_day[day] = []  # Use a list to store schedules for each day
+
+        for time_slot in time_slots:
+            entry = {'time_slot': time_slot, 'schedule': {}}
+
+            for teacher in teachers:
+                for lecture in lectures:
+                    for classroom in classrooms:
+                        for grade in grades:
+                            if x[(teacher, lecture, time_slot, day, classroom, grade)].varValue == 1:
+                                entry['schedule'][f"{teacher}/{lecture}/{classroom}/{grade}"] = lecture
+
+            schedules_by_day[day].append(entry)
+
+    
+
+@app.route('/')
+def upload_form():
+    return render_template('upload.html')
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return redirect(request.url)
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return redirect(request.url)
+
+    if file and file.filename.endswith('.json'):
+        try:
+            # Save the uploaded file with a unique name
+            unique_filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            file.save(unique_filename)
+
+            # Process the JSON file
+            with open(unique_filename, 'r') as json_file:
+                data = json.load(json_file)
+                lectures = data["data"]["lectures"]
+                classrooms = data["data"]["classrooms"]
+                grades = data["data"]["grades"]
+                teachers = data["data"]["teachers"]
+                time_slots = data["data"]["time_slots"]
+                days = data["data"]["days"]
+
+            # Perform optimization using PuLP
+            results = optimize_with_pulp(data, lectures, classrooms, grades, teachers, time_slots, days)
+
+            # Render the home page with results
+            return render_template('teacher.html', teacher_schedules=teacher_schedules)
+        except json.JSONDecodeError as e:
+            return f"Error decoding JSON: {e}"
+        except Exception as e:
+            return f"An error occurred: {e}"
+
+    return 'Invalid file format. Please upload a JSON file.', 400
 
 
-    # Define the schedules variable before rendering the template
-    return render_template('schedule.html', schedules=schedules, grades=grades)
+@app.route('/day')
+def render_day_page():
+    return render_template('day.html', schedules_by_day=schedules_by_day, days=days)
 
+@app.route('/teacher')
+def render_teacher_page():
+    return render_template('teacher.html', teacher_schedules=teacher_schedules)
+
+@app.route('/schedule')
+def render_schedule_page():
+    return render_template('schedule.html', schedules=schedules)
 
 if __name__ == '__main__':
     app.run(debug=True)
+            # Define a dictionary to store teacher schedules

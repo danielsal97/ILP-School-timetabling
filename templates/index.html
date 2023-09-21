@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Schedules</title>
+</head>
+<body>
+    <h1>School Schedules</h1>
+
+    <!-- Display the Grade Schedules -->
+    {% for grade, grade_table in grade_html.items() %}
+    {{ grade_table | safe }}
+    {% endfor %}
+
+    <!-- Display the Teacher Schedules -->
+    {% for teacher, teacher_table in teacher_html.items() %}
+    {{ teacher_table | safe }}
+    {% endfor %}
+
+    <!-- Display the Schedules by Day -->
+    {% for day, day_table in day_html.items() %}
+    {{ day_table | safe }}
+    {% endfor %}
+</body>
+</html>

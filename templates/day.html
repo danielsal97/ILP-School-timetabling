@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedules by Day</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Schedules by Day</h1>
+    
+        <!-- Iterate over days -->
+        {% for day, day_schedule in schedules_by_day.items() %}
+        <h2>{{ day }}</h2>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Time Slot</th>
+                <th>Schedule</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Iterate over schedules for the current day -->
+            {% for entry in day_schedule %}
+                <tr>
+                    <td>{{ entry['time_slot'] }}</td>
+                    <td>
+                        <ul>
+                            <!-- Iterate over schedule entries for the current time slot -->
+                            {% for schedule, lecture in entry['schedule'].items() %}
+                            <li>{{ schedule }} ({{ lecture }})</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+{% endblock %}
+```

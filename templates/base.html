@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}School Schedule{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        header {
+            background-color: #333; /* Dark gray background for the header */
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        nav ul li:last-child {
+            margin-right: 0;
+        }
+        nav a {
+            text-decoration: none;
+            color: white;
+        }
+        .content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 style="color: white;">School Schedule</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('upload_form') }}">Upload</a></li>
+                <li><a href="{{ url_for('render_schedule_page') }}">Schedule</a></li>
+                <li><a href="{{ url_for('render_day_page') }}">Day</a></li>
+                <li><a href="{{ url_for('render_teacher_page') }}">Teacher</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
