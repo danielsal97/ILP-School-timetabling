@@ -1,38 +1,19 @@
 {
     "data": {
-        "lectures": {
-            "Math": 2,
-            "English": 2,
-            "Science": 2,
-            "History": 2
-        },
-        "classrooms": {
-            "Classroom 1": {
-                "Math": 2,
-                "English": 2,
-                "Science": 2,
-                "History": 2
-            },
-            "Classroom 2": {
-                "Math": 2,
-                "English": 2,
-                "Science": 2,
-                "History": 2
-            }
-        },
         "grades": {
             "A": {
                 "Classroom 1": {
-                    "Math": 2,
-                    "English": 2,
-                    "Science": 2,
-                    "History": 2
+                    "Math": 3,
+                    "English": 3,
+                    "Science": 3,
+                    "History": 3,
+                    "geography": 3
                 },
                 "Classroom 2": {
-                    "Math": 2,
-                    "English": 2,
-                    "Science": 2,
-                    "History": 2
+                    "Math": 3,
+                    "English": 3,
+                    "Science": 3,
+                    "History": 3
                 }
             },
             "B": {
@@ -51,11 +32,11 @@
             }
         },
         "teachers": {
-            "Smith": [100, ["Math", "History", "Science"], ["N", "Friday"]],
-            "Johnson": [100, ["English"], ["Friday", "N"]],
-            "Williams": [100, ["Science", "English"], ["N", "N"]]
+            "Smith": [15, ["Math", "History", "Science"], ["N", "Friday"]],
+            "Johnson": [15, ["English"], ["Friday", "N"]],
+            "Williams": [17, ["Science", "English", "geography"], ["N", "N"]]
         },
-        "time_slots": ["8-9", "9-10", "10-11", "11-12", "12-13", "13-14", "14-15", "15-16", "16-17"],
+        "time_slots": ["8-9", "9-10", "11-12", "12-13", "12-14", "14-15", "15-16", "16-17"],
         "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     }
 }

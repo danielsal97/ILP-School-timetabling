@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
@@ -12,45 +11,120 @@
 </head>
 <body>
 
-    <div class="container">
-        <h1>Schedules by Day</h1>
-    
-        <!-- Iterate over days -->
-        {% for day, day_schedule in schedules_by_day.items() %}
-        <h2>{{ day }}</h2>
-        <table class="table table-bordered">
-            <thead>
+<div class="container">
+    <h1>Schedules by Day</h1>
+
+    <!-- Iterate over days -->
+    {% for day, day_schedule in schedules_by_day.items() %}
+    <h2>{{ day }}</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Time Slot</th>
+            <th>Schedule</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over schedules for the current day -->
+        {% for entry in day_schedule %}
             <tr>
-                <th>Time Slot</th>
-                <th>Schedule</th>
+                <td>{{ entry['time_slot'] }}</td>
+                <td>
+                    <ul>
+                        <!-- Iterate over schedule entries for the current time slot -->
+                        {% for schedule, lecture in entry['schedule'].items() %}
+                            {% if "/" in schedule %}
+                                {% set teacher, _, _, _ = schedule.split('/') %}
+                                {% set key = (teacher, day, entry['time_slot']) %}
+                                {% if key in teacher_conflicts %}
+                                    {% set conflictClass = 'conflict' %}
+                                {% else %}
+                                    {% set conflictClass = '' %}
+                                    {% set teacherConflictMessage = '' %}
+                                {% endif %}
+                                <li class="teacher-{{ teacher }} {{ conflictClass }}">{{ schedule }} ({{ lecture }}{{ teacherConflictMessage }})</li>
+                            {% else %}
+                                <li>{{ schedule }} ({{ lecture }})</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            <!-- Iterate over schedules for the current day -->
-            {% for entry in day_schedule %}
-                <tr>
-                    <td>{{ entry['time_slot'] }}</td>
-                    <td>
-                        <ul>
-                            <!-- Iterate over schedule entries for the current time slot -->
-                            {% for schedule, lecture in entry['schedule'].items() %}
-                            <li>{{ schedule }} ({{ lecture }})</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
         {% endfor %}
-    </div>
+        </tbody>
+    </table>
+    {% endfor %}
+</div>
 
-    <!-- Include Bootstrap JS and jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Include Bootstrap JS and jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+// Define an array of predefined colors (not including red)
+var predefinedColors = [
+    "#FF5733", // Orange
+    "#33FF5D", // Green
+    "#3366FF", // Blue
+    "#FF33D1", // Pink
+    "#FFAF33", // Yellow
+    "#8333FF", // Purple
+    "#33FFC1", // Cyan
+    "#FF3361", // Magenta
+    "#33A3FF", // Light Blue
+    "#A333FF"  // Lavender
+];
 
+function getRandomColor() {
+    return predefinedColors[Math.floor(Math.random() * predefinedColors.length)];
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var teacherColors = {}; // Dictionary to store unique colors for teachers
+
+    // Get all <li> elements with class starting with "teacher-"
+    var teacherElements = document.querySelectorAll('[class^="teacher-"]');
+
+    // Iterate over the teacher elements
+    teacherElements.forEach(function(teacherElement) {
+        // Extract the teacher's name from the class
+        var classes = teacherElement.className.split(' ');
+        for (var i = 0; i < classes.length; i++) {
+            if (classes[i].startsWith('teacher-')) {
+                var teacherName = classes[i].substring(8); // Remove "teacher-" prefix
+
+                // Check if a color has already been assigned to this teacher
+                if (!(teacherName in teacherColors)) {
+                    teacherColors[teacherName] = getRandomColor();
+                }
+
+                // Apply the color to the schedule
+                teacherElement.style.backgroundColor = teacherColors[teacherName];
+            }
+        }
+    });
+
+    // Get all <li> elements with class "conflict"
+    var conflictElements = document.querySelectorAll('.conflict');
+
+    // Iterate over the elements with conflicts
+    conflictElements.forEach(function(conflictElement) {
+        // Apply a white background to the elements with conflicts
+        conflictElement.style.backgroundColor = 'white';
+
+        // Create and append the error message for teachers with conflicts
+        var teacherName = conflictElement.className.match(/teacher-([^\s]+)/);
+        if (teacherName && teacherName[1]) {
+            var errorMessage = document.createElement('span');
+            errorMessage.className = 'text-danger font-weight-bold'; // Add the 'text-danger' and 'font-weight-bold' classes
+            errorMessage.textContent = ' (teacher cannot be in more  then one classroom at the same time)';
+            conflictElement.appendChild(errorMessage);
+        }
+    });
+});
+
+
+</script>
 </body>
 </html>
 {% endblock %}
-```
