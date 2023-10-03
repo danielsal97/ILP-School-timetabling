@@ -1,40 +1,44 @@
 {
     "data": {
+        
         "grades": {
             "A": {
                 "Classroom 1": {
-                    "Math": 3,
-                    "English": 3,
+
                     "Science": 3,
                     "History": 3,
                     "geography": 3
+                    
                 },
                 "Classroom 2": {
-                    "Math": 3,
-                    "English": 3,
+
                     "Science": 3,
                     "History": 3
                 }
             },
             "B": {
                 "Classroom 1": {
-                    "Math": 2,
-                    "English": 2,
+
                     "Science": 2,
                     "History": 2
                 },
                 "Classroom 2": {
-                    "Math": 2,
-                    "English": 2,
+
                     "Science": 2,
                     "History": 2
                 }
             }
         },
         "teachers": {
-            "Smith": [15, ["Math", "History", "Science"], ["N", "Friday"]],
-            "Johnson": [15, ["English"], ["Friday", "N"]],
-            "Williams": [17, ["Science", "English", "geography"], ["N", "N"]]
+            "Smith": [30, ["Math", "History", "Science","English"], [ "Friday"],["A", "Classroom 1"]],
+            "Johnson": [30, ["English","Math"], ["Friday", "N"],["A", "Classroom 1"]],
+            "Williams": [30, ["Science", "English", "geography"], ["N"],["A", "Classroom 1"]],
+            "Beri": [30, ["English","Math"], ["Friday"],["A", "Classroom 1"]]
+
+        },
+        "subClasses":{
+            "English": ["A", "B"],
+            "Math": ["A", "B"]
         },
         "time_slots": ["8-9", "9-10", "11-12", "12-13", "12-14", "14-15", "15-16", "16-17"],
         "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
