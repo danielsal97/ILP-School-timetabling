@@ -54,12 +54,12 @@ def is_feasible(data, grades, teachers, time_slots, days):
 
 
 
-def optimize_with_pulp(data, grades, teachers, time_slots, days):
+def optimize_with_pulp(data, grades, teachers, time_slots, days,lectures):
      # Define the problem
     prob = LpProblem("School_Scheduling", LpMaximize)
 
     # Define the decision variables
-    x = LpVariable.dicts("x", [(i, j, k,d, c, km) for i in teachers for km in grades for c in grades[km] for j in grades[km][c] for k in time_slots for d in days ],
+    x = LpVariable.dicts("x", [(i, j, k,d, c, km,sub) for i in teachers for km in grades for c in grades[km] for j in grades[km][c] for k in time_slots for d in days  for subb in lectures[j]  for sub in subb ],
                         cat='Binary')
     groups = ["level1","level2","level3"]
     g = LpVariable.dicts("g", [(k, d) for k in range(len(time_slots) - 1) for d in days], cat='Binary')
@@ -71,45 +71,54 @@ def optimize_with_pulp(data, grades, teachers, time_slots, days):
 
     # Add constraints
   
-    for km in grades:
+    for km in grades: 
         for c in grades[km]:
             for j, amount in grades[km][c].items():
                 #each lecture will be taught amount times
-                prob += lpSum(x[i, j, k, d, c, km] for i in teachers for k in time_slots for d in days) == amount 
-              
+                for subb in lectures[j]:
+                    print(subb)
+                    for sub in subb:
+                            prob += lpSum(x[i, j, k, d, c, km, sub] for i in teachers for k in time_slots for d in days  ) == amount * len(subb)
+
+    
+
             for d in days:
-                prob += lpSum(x[i, j, k, d, c , km] for i in teachers for j in grades[km][c].keys() for k in time_slots) <= 4
+                prob += lpSum(x[i, j, k, d, c , km, sub] for i in teachers for j in grades[km][c].keys() for k in time_slots for subb in lectures[j]  for sub in subb) <= 4
+
                 for k in time_slots:
 
 
                     # Constraint: Each lecture in each classroom on each day must be assigned up to one teacher
-                    prob += lpSum(x[i, j, k, d, c, km] for i in teachers for j in grades[km][c].keys()) <= 1
+                    # prob += lpSum(x[i, j, k, d, c, km,sub] for i in teachers for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb) <= 1
 
+                    for subb in lectures[j]:
+                        for sub in subb:
+                            # Constraint: Each lecture in each classroom on each day must be assigned up to one teacher
+                            prob += lpSum(x[i, j, k, d, c, km,sub] for i in teachers  ) <= 1
+                
                 for k in range(len(time_slots)-1):
-                        prob += lpSum(x[i, j, time_slots[k], d, c, km] for i in teachers for j in grades[km][c].keys()) - lpSum(
-                            x[i, j, time_slots[k + 1], d, c, km] for i in teachers for j in grades[km][c].keys()) >=  -1+ g[k, d]
+                        prob += lpSum(x[i, j, time_slots[k], d, c, km,sub] for i in teachers for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb) - lpSum(
+                            x[i, j, time_slots[k + 1], d, c, km, sub] for i in teachers for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb)  >=  -1+ g[k, d]
                             # print(amount)
-
     for i in teachers:
         # Constraint: The total number of lectures assigned to each teacher must not exceed their maximum workload
-        prob += lpSum(x[i, j, k, d, c, km] for k in time_slots for d in days for km in grades for c in grades[km]  for j in grades[km][c].keys()) <= teachers[i][0]
-        for k in time_slots:
+        prob += lpSum(x[i, j, k, d, c, km,sub ] for k in time_slots for d in days for km in grades for c in grades[km]  for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb) <= teachers[i][0]
+        # for k in time_slots:
                 # Constraint: Each teacher can only be assigned to at most one lecture in each time slot
-                prob += lpSum(x[i, j, k, d, c, km ] for km in grades for c in grades[km] for j in grades[km][c]) <= 1
-
+                # prob += lpSum(x[i, j, k, d, c, km,sub  ] for km in grades for c in grades[km] for j in grades[km][c] for subb in lectures[j]  for sub in subb) <= 1
         for d in days:
             for k in time_slots:
                 # Constraint: Each teacher can only be assigned to at most one lecture in each time slot
-                prob += lpSum(x[i, j, k, d, c, km ] for km in grades for c in grades[km] for j in grades[km][c]) <= 1
+                prob += lpSum(x[i, j, k, d, c, km ,sub] for km in grades for c in grades[km] for j in grades[km][c] for subb in lectures[j]  for sub in subb) <= 1
 
         if teachers[i][2] != 'N':
             for d in days:
                 if d in teachers[i][2]:
                     # Constraint: If a teacher has a day off, they cannot be assigned to any lecture on that day
                     for k in time_slots:
-                        prob += lpSum(x[i, j, k, d, c, km ] for km in grades for c in grades[km] for j in grades[km][c] ) == 0
+                        prob += lpSum(x[i, j, k, d, c, km,sub ] for km in grades for c in grades[km] for j in grades[km][c] for subb in lectures[j]  for sub in subb ) == 0
 
-                
+         
     # prob.solve(GLPK_CMD(msg=0))
             # Check the status
 # Solve the linear programming problem
@@ -155,8 +164,10 @@ def optimize_with_pulp(data, grades, teachers, time_slots, days):
                 for day in days:
                     for teacher in teachers:
                         for lecture in grades[grade][classroom]:
-                            if x[(teacher, lecture, time_slot, day, classroom, grade)].varValue == True:
-                                entry['schedule'][day] = f"{teacher}/{lecture}"
+                            for subb in lectures[lecture]:
+                                for sub in subb:
+                                    if x[(teacher, lecture, time_slot, day, classroom, grade,sub)].varValue == True:
+                                        entry['schedule'][day] = f"{teacher}/{lecture}/{sub}"
 
                 schedules[grade][classroom].append(entry)
 
@@ -173,8 +184,10 @@ def optimize_with_pulp(data, grades, teachers, time_slots, days):
                 for grade in grades:
                     for classroom in grades[grade]:
                         for lecture in grades[grade][classroom]:
-                            if x[(teacher, lecture, time_slot, day, classroom, grade)].varValue == 1:
-                                entry['schedule'][day] = f"{lecture}/{classroom}/{grade}"
+                            for subb in lectures[lecture]:
+                                for sub in subb:
+                                    if x[(teacher, lecture, time_slot, day, classroom, grade,sub )].varValue == 1:
+                                        entry['schedule'][day] = f"{lecture}/{classroom}/{grade}/{sub}"
 
             teacher_schedules[teacher].append(entry)
 
@@ -191,36 +204,37 @@ def optimize_with_pulp(data, grades, teachers, time_slots, days):
                 for grade in grades:
                     for classroom in grades[grade]:
                         for lecture in grades[grade][classroom]:
-                            if x[(teacher, lecture, time_slot, day, classroom, grade)].varValue == 1:
-                                entry['schedule'][f"{teacher}/{lecture}/{classroom}/{grade}"] = lecture
+                            for subb in lectures[lecture]:
+                                for sub in subb:
+                                    if x[(teacher, lecture, time_slot, day, classroom, grade,sub)].varValue == 1:
+                                        entry['schedule'][f"{teacher}/{lecture}/{classroom}/{grade}/{sub}"] = lecture
 
             schedules_by_day[day].append(entry)
 
 
 
 
-    print(schedules)
 def find_teacher_conflicts(schedules_by_day):
     # Create a dictionary to store merged lectures
     teacher_conflicts = {}
 
-#     for day, day_schedule in schedules_by_day.items():
-#         for entry in day_schedule:
-#             for schedule, lecture in entry['schedule'].items():
-#                 if "/" in schedule:
-#                     teacher, _, _, time_slot = schedule.split('/')
-#                     # Create a unique key based on teacher, day, and time slot
-#                     key = (teacher, day, entry['time_slot'])
-#                     # Initialize the list if it doesn't exist in the dictionary
-#                     if key not in teacher_conflicts:
-#                         teacher_conflicts[key] = []
-#                     # Append the lecture to the list
-#                     teacher_conflicts[key].append(lecture)
+    # for day, day_schedule in schedules_by_day.items():
+    #     for entry in day_schedule:
+    #         for schedule, lecture in entry['schedule'].items():
+    #             if "/" in schedule:
+    #                 teacher, _, _, time_slot = schedule.split('/')
+    #                 # Create a unique key based on teacher, day, and time slot
+    #                 key = (teacher, day, entry['time_slot'])
+    #                 # Initialize the list if it doesn't exist in the dictionary
+    #                 if key not in teacher_conflicts:
+    #                     teacher_conflicts[key] = []
+    #                 # Append the lecture to the list
+    #                 teacher_conflicts[key].append(lecture)
 
-#     # Remove entries where the number of lectures is 1 or less
-#     teacher_conflicts = {key: lectures for key, lectures in teacher_conflicts.items() if len(lectures) > 1}
+    # # Remove entries where the number of lectures is 1 or less
+    # teacher_conflicts = {key: lectures for key, lectures in teacher_conflicts.items() if len(lectures) > 1}
 
-    print(teacher_conflicts)
+    # print(teacher_conflicts)
 
     return teacher_conflicts
 
@@ -254,6 +268,7 @@ def upload_file():
                 teachers = data["data"]["teachers"]
                 time_slots = data["data"]["time_slots"]
                 days = data["data"]["days"]
+                lectures = data["data"]["lectures"]
             # Perform optimization using PuLP
             check = is_feasible(data, grades, teachers, time_slots, days)
             if check[0] == False:
@@ -263,7 +278,7 @@ def upload_file():
                 print("feasible")
                 print(check[1])
 
-            results = optimize_with_pulp(data, grades, teachers, time_slots, days)
+            results = optimize_with_pulp(data, grades, teachers, time_slots, days,lectures)
 
             # Render the home page with results
             return render_template('teacher.html', teacher_schedules=teacher_schedules)

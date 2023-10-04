@@ -33,19 +33,18 @@
                     <ul>
                         <!-- Iterate over schedule entries for the current time slot -->
                         {% for schedule, lecture in entry['schedule'].items() %}
-                            {% if "/" in schedule %}
-                                {% set teacher, _, _, _ = schedule.split('/') %}
-                                {% set key = (teacher, day, entry['time_slot']) %}
-                                {% if key in teacher_conflicts %}
-                                    {% set conflictClass = 'conflict' %}
-                                {% else %}
-                                    {% set conflictClass = '' %}
-                                    {% set teacherConflictMessage = '' %}
-                                {% endif %}
-                                <li class="teacher-{{ teacher }} {{ conflictClass }}">{{ schedule }} ({{ lecture }}{{ teacherConflictMessage }})</li>
+                            {% set parts = schedule.split('/') %}
+                            {% set teacher = parts[0] if parts|length >= 1 else '' %}
+                            {% set lecture = parts[1] if parts|length >= 2 else '' %}
+                            {% set sub = parts[4] %}
+                            {% set key = (teacher, day, entry['time_slot']) %}
+                            {% if key in teacher_conflicts %}
+                                {% set conflictClass = 'conflict' %}
                             {% else %}
-                                <li>{{ schedule }} ({{ lecture }})</li>
+                                {% set conflictClass = '' %}
+                                {% set teacherConflictMessage = '' %}
                             {% endif %}
+                            <li class="teacher-{{ teacher }} {{ conflictClass }}">{{ schedule }} ({{ lecture }} - {{ sub }}{{ teacherConflictMessage }})</li>
                         {% endfor %}
                     </ul>
                 </td>
@@ -110,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Iterate over the elements with conflicts
     conflictElements.forEach(function(conflictElement) {
         // Apply a white background to the elements with conflicts
-        conflictElement.style.backgroundColor = 'white';
+        conflictElement.style.backgroundColor = 'red';
 
         // Create and append the error message for teachers with conflicts
         var teacherName = conflictElement.className.match(/teacher-([^\s]+)/);
