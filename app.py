@@ -1,11 +1,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for
-import json
-import matplotlib.pyplot as plt
-import numpy as np
 from pulp import *
-import random
-import re
+
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -16,293 +12,161 @@ days = []
 unsatisfied_constraints = []
 teacher_conflicts = {}
 jsonFileResults = {}
-def is_feasible(data, grades, teachers, time_slots, days):
-    # Perform preliminary checks for feasibility
-
-    # Check if there are enough classrooms and time slots to accommodate all lectures
-    total_lectures = sum(len(lectures) for grade in grades for classroom, lectures in grades[grade].items())
-    total_available_slots = len(time_slots) * len(days) * sum(len(grades[grade]) for grade in grades)
-    
-    if total_lectures > total_available_slots:
-        return False, "Not enough slots and classrooms for all lectures."
-
-
-    # Check if any teacher is assigned to invalid lectures
+def check_data(classrooms, grades, teachers, time_slots, days,subject):
+    max_workload = {}
+    # # Perform preliminary checks for feasibility
     for teacher, teacher_data in teachers.items():
-        for lecture in teacher_data[1]:
-            lecture_found = False
-            for grade in grades:
-                for classroom in grades[grade]:
-                    if lecture in grades[grade][classroom]:
-                        lecture_found = True
-                        break
-                if lecture_found:
-                    break
-            if not lecture_found:
-                return False, f"Teacher {teacher} is not qualified for lecture {lecture}."
-
-    # Check if the maximum workload of each teacher can be satisfied
-    for teacher, teacher_data in teachers.items():
-        max_workload = teacher_data[0]
-        total_assigned_lectures = sum(len(lectures) for grade in grades for classroom, lectures in grades[grade].items() if lecture in teacher_data[1])
-        if total_assigned_lectures > max_workload:
-            return False, f"Teacher {teacher} has a maximum workload of {max_workload} but is assigned {total_assigned_lectures} lectures."
-
-    # Check for any other specific constraints as needed
-
-    return True, "Preliminary checks passed. The problem appears feasible."
-
-
-
-def optimize_with_pulp(data, grades, teachers, time_slots, days,lectures):
-     # Define the problem
-    prob = LpProblem("School_Scheduling", LpMaximize)
-
-    # Define the decision variables
-    x = LpVariable.dicts("x", [(i, j, k,d, c, km,sub) for i in teachers for km in grades for c in grades[km] for j in grades[km][c] for k in time_slots for d in days  for subb in lectures[j]  for sub in subb ],
-                        cat='Binary')
-    groups = ["level1","level2","level3"]
-    g = LpVariable.dicts("g", [(k, d) for k in range(len(time_slots) - 1) for d in days], cat='Binary')
-
-    # Define the objective function
-    prob += lpSum(x) + lpSum(g) 
-
-
-
-    # Add constraints
+        max_workload.update({teacher: teacher_data[0]})
+        
   
-    for km in grades: 
-        for c in grades[km]:
-            for j, amount in grades[km][c].items():
-                #each lecture will be taught amount times
-                for subb in lectures[j]:
-                    print(subb)
-                    for sub in subb:
-                            prob += lpSum(x[i, j, k, d, c, km, sub] for i in teachers for k in time_slots for d in days  ) == amount * len(subb)
+    for teacher in max_workload:
+        for grade in grades:
+            sum=0
+            for classroom in grades[grade]:
+                for subject in grades[grade][classroom]:
+                    for amount in grades[grade][classroom][subject]:
+                        if isinstance(amount, int):
+                            sum+=amount
+                            if grades[grade][classroom][subject][1] == teacher:
+                               max_workload[teacher] -= grades[grade][classroom][subject][0]
 
+
+        if max_workload[teacher] < 0:
+            return False, f"Teacher {teacher} has got more lesson from his maximum workload."
+        print(teacher, max_workload[teacher])
+
+
+    return True, "Preliminary checks passed. data is ok ."
+
+
+
+def optimize_with_pulp(classrooms, grades, teachers, time_slots, days,subjects):
+     # Define the problem
+    prob = LpProblem("School_Timetabling", LpMaximize)
+   
+    # Define the decision variables
+    x = LpVariable.dicts("x", [(teacher, subject, time_slot,day, classroom, grade) for teacher  in teachers \
+                               for grade in grades for classroom in classrooms for subject in subjects \
+                                for time_slot in time_slots for day in days], cat='Binary')
+    # Define the objective function here
+    prob += lpSum(x)
+    #constraints
+    for day in days:
+        for time  in time_slots:
+            for teacher in teachers:
+                # teacher can teach only one subject at a time
+                prob += lpSum(x[(teacher, subject, time, day, classroom, grade)] \
+                              for grade in grades for classroom in classrooms\
+                                  for subject in subjects) <= 1
+
+        for teacher in teachers:
+            if day in teachers[teacher][2]:
+                for time in time_slots:
+                    # teacher has days off 
+                    prob += lpSum(x[(teacher, subject, time, day, classroom, grade)]\
+                                   for grade in grades for classroom in classrooms \
+                                    for subject in subjects) == 0
     
+        for grade in grades:
+            for classroom in classrooms:
+                if classroom in grades[grade]:
 
-            for d in days:
-                prob += lpSum(x[i, j, k, d, c , km, sub] for i in teachers for j in grades[km][c].keys() for k in time_slots for subb in lectures[j]  for sub in subb) <= 4
-
-                for k in time_slots:
-
-
-                    # Constraint: Each lecture in each classroom on each day must be assigned up to one teacher
-                    # prob += lpSum(x[i, j, k, d, c, km,sub] for i in teachers for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb) <= 1
-
-                    for subb in lectures[j]:
-                        for sub in subb:
-                            # Constraint: Each lecture in each classroom on each day must be assigned up to one teacher
-                            prob += lpSum(x[i, j, k, d, c, km,sub] for i in teachers  ) <= 1
-                
-                for k in range(len(time_slots)-1):
-                        prob += lpSum(x[i, j, time_slots[k], d, c, km,sub] for i in teachers for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb) - lpSum(
-                            x[i, j, time_slots[k + 1], d, c, km, sub] for i in teachers for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb)  >=  -1+ g[k, d]
-                            # print(amount)
-    for i in teachers:
-        # Constraint: The total number of lectures assigned to each teacher must not exceed their maximum workload
-        prob += lpSum(x[i, j, k, d, c, km,sub ] for k in time_slots for d in days for km in grades for c in grades[km]  for j in grades[km][c].keys() for subb in lectures[j]  for sub in subb) <= teachers[i][0]
-        # for k in time_slots:
-                # Constraint: Each teacher can only be assigned to at most one lecture in each time slot
-                # prob += lpSum(x[i, j, k, d, c, km,sub  ] for km in grades for c in grades[km] for j in grades[km][c] for subb in lectures[j]  for sub in subb) <= 1
-        for d in days:
-            for k in time_slots:
-                # Constraint: Each teacher can only be assigned to at most one lecture in each time slot
-                prob += lpSum(x[i, j, k, d, c, km ,sub] for km in grades for c in grades[km] for j in grades[km][c] for subb in lectures[j]  for sub in subb) <= 1
-
-        if teachers[i][2] != 'N':
-            for d in days:
-                if d in teachers[i][2]:
-                    # Constraint: If a teacher has a day off, they cannot be assigned to any lecture on that day
-                    for k in time_slots:
-                        prob += lpSum(x[i, j, k, d, c, km,sub ] for km in grades for c in grades[km] for j in grades[km][c] for subb in lectures[j]  for sub in subb ) == 0
-
-         
-    # prob.solve(GLPK_CMD(msg=0))
-            # Check the status
-# Solve the linear programming problem
-
-    prob.solve()
+                    for teacher in teachers:
+                        for subject in subjects:
+                            if subject in grades[grade][classroom]:
+                                #each can be taught once a day
+                                prob += lpSum(x[(teacher, subject, time, day, classroom, grade)] for time in time_slots) <= 1
 
 
-    filename = "example_problem.json"
-    prob.toJson(filename)
-    # Check if the problem status is optimal
-    if LpStatus[prob.status] != "Optimal":
-        print("The problem is not solved optimally with CBC.")
-        # prob.solve(GLPK_CMD())
-        # if LpStatus[prob.status] != "Optimal":
-        #     print("The problem is not solved optimally.")        
-        # # Iterate through the constraints and check if each one is violated
-        # for constraint_name, constraint_expr in prob.constraints.items():
-        #     if constraint_expr.value() > 0:
-        #         # Print the associated error message for the violated constraint
-        #         if constraint_name in constraint_messages:
-        #             print(constraint_messages[constraint_name])
-        #         else:
-        #             print(f"Constraint {constraint_name} is not satisfied (Value = {constraint_expr.value()})")
-        for i in unsatisfied_constraints:
-            print(i)
-    else:
-        # The problem is optimal, and the constraints are satisfied
-        print("The problem is solved optimally, and the constraints are satisfied.")
-
-    for v in prob.variables():
-        if v.varValue == True and v.name.startswith('y'):
-            print(v.name, "=", v.varValue)
 
     for grade in grades:
-        schedules[grade] = {}  # Use a dictionary to store schedules for each grade
+        for classroom in classrooms:
+            if classroom not in grades[grade]:
+                prob += lpSum(x[(teacher, subject, time, day, classroom, grade)] for teacher in teachers for time in time_slots for day in days for subject in subjects) == 0
 
-        for classroom in grades[grade]:
-            schedules[grade][classroom] = []  # Use a list to store schedules for each classroom
-
-            for time_slot in time_slots:
-                entry = {'time_slot': time_slot, 'schedule': {day: '' for day in days}}
-
+            else:
                 for day in days:
-                    for teacher in teachers:
-                        for lecture in grades[grade][classroom]:
-                            for subb in lectures[lecture]:
-                                for sub in subb:
-                                    if x[(teacher, lecture, time_slot, day, classroom, grade,sub)].varValue == True:
-                                        entry['schedule'][day] = f"{teacher}/{lecture}/{sub}"
+                    #each day has at least 2 lessons
+                    prob+= lpSum(x[(teacher, subject, time, day, classroom, grade)] for teacher in teachers for time in time_slots for subject in subjects) >=2
+                    
+                    for time in range(len(time_slots)-1):
+                        #minimize the number of breaks between lessons
+                        prob += lpSum(x[(teacher, subject, time_slots[time], day, classroom, grade)] for teacher in teachers for subject in subjects) - lpSum(x[(teacher, subject, time_slots[time+1], day, classroom, grade)] for teacher in teachers for subject in subjects) >= 0
+                    for time in time_slots:
+                        #at every time slot there is only one subject taught by one teacher
+                        prob += lpSum(x[(teacher, subject, time, day, classroom, grade)] for teacher in teachers for subject in subjects) <= 1
+                for subject in subjects:
+                    if subject not in grades[grade][classroom]:
+                        prob += lpSum(x[(teacher, subject, time, day, classroom, grade)] for teacher in teachers for time in time_slots for day in days) == 0 
+                    else:
+                        #number of subjects in a classroom is as demanded by the school
+                        prob += lpSum(x[(teacher, subject, time, day, classroom, grade)] for teacher in teachers for time in time_slots for day in days) == grades[grade][classroom][subject][0]
+                        for teacher in teachers:
+                            if teacher != grades[grade][classroom][subject][1]:
+                                prob += lpSum(x[(teacher, subject, time, day, classroom, grade)] for time in time_slots for day in days) == 0
 
-                schedules[grade][classroom].append(entry)
+                                
+    # Solve the optimization problem with the default solver 
+    prob.solve()
+    # Check if the problem status is optimal
+    if LpStatus[prob.status] != "Optimal":
+        print("The problem is not solved optimally.")
+        print("GLPk simplex is running...")
+        prob.solve(GLPK_CMD("/opt/homebrew/bin/glpsol"))
+        if LpStatus[prob.status] != "Optimal":
+            print("The problem is not solved optimally. ")
+        else:
+            print("The problem is solved optimally.")       
 
 
+# sorder result and pass it to schedule view 
+    for grade in grades:
+        schedules[grade] = {}  # Use a dictionary to store schedules for each grade
+        for classroom in classrooms:
+            if classroom in grades[grade]:
+                schedules[grade][classroom] = []  # Use a list to store schedules for each classroom
+                for time_slot in time_slots:
+                    entry = {'time_slot': time_slot, 'schedule': {day: '' for day in days}}
+                    for day in days:
+                        for teacher in teachers:
+                            for subject in subjects:
+                                if x[(teacher, subject, time_slot, day, classroom, grade)].varValue == True:
+                                    entry['schedule'][day] = f"{teacher}/{subject}"
+                    schedules[grade][classroom].append(entry)
+         
 
-    # Iterate over teachers
+
+    # sorder result and pass it to teachers view 
     for teacher in teachers:
         teacher_schedules[teacher] = []  # Use a list to store schedules for each teacher
-
         for time_slot in time_slots:
             entry = {'time_slot': time_slot, 'schedule': {day: '' for day in days}}
-
             for day in days:
                 for grade in grades:
-                    for classroom in grades[grade]:
-                        for lecture in grades[grade][classroom]:
-                            for subb in lectures[lecture]:
-                                for sub in subb:
-                                    if x[(teacher, lecture, time_slot, day, classroom, grade,sub )].varValue == 1:
-                                        entry['schedule'][day] = f"{lecture}/{classroom}/{grade}/{sub}"
-
+                    for classroom in classrooms:
+                        if classroom in grades[grade]:
+                            for subject in subjects:
+                                if subject in grades[grade][classroom]:
+                                    if x[(teacher, subject, time_slot, day, classroom, grade )].varValue == 1:
+                                        entry['schedule'][day] = f"{subject}/{classroom}/{grade}"
             teacher_schedules[teacher].append(entry)
 
     
     
-    # Iterate over days
+    # sorder result and pass it to days view 
     for day in days:
         schedules_by_day[day] = []  # Use a list to store schedules for each day
-
         for time_slot in time_slots:
             entry = {'time_slot': time_slot, 'schedule': {}}
-
             for teacher in teachers:
                 for grade in grades:
-                    for classroom in grades[grade]:
-                        for lecture in grades[grade][classroom]:
-                            for subb in lectures[lecture]:
-                                for sub in subb:
-                                    if x[(teacher, lecture, time_slot, day, classroom, grade,sub)].varValue == 1:
-                                        entry['schedule'][f"{teacher}/{lecture}/{classroom}/{grade}/{sub}"] = lecture
-
+                    for classroom in classrooms:
+                        if classroom in grades[grade]:
+                            for subject in subjects:
+                                if x[(teacher, subject, time_slot, day, classroom, grade)].varValue == 1:
+                                    entry['schedule'][f"{teacher}/{subject}/{classroom}/{grade}"] = subject
             schedules_by_day[day].append(entry)
 
 
 
 
-def find_teacher_conflicts(schedules_by_day):
-    # Create a dictionary to store merged lectures
-    teacher_conflicts = {}
-
-    # for day, day_schedule in schedules_by_day.items():
-    #     for entry in day_schedule:
-    #         for schedule, lecture in entry['schedule'].items():
-    #             if "/" in schedule:
-    #                 teacher, _, _, time_slot = schedule.split('/')
-    #                 # Create a unique key based on teacher, day, and time slot
-    #                 key = (teacher, day, entry['time_slot'])
-    #                 # Initialize the list if it doesn't exist in the dictionary
-    #                 if key not in teacher_conflicts:
-    #                     teacher_conflicts[key] = []
-    #                 # Append the lecture to the list
-    #                 teacher_conflicts[key].append(lecture)
-
-    # # Remove entries where the number of lectures is 1 or less
-    # teacher_conflicts = {key: lectures for key, lectures in teacher_conflicts.items() if len(lectures) > 1}
-
-    # print(teacher_conflicts)
-
-    return teacher_conflicts
-
-
-@app.route('/')
-def upload_form():
-    return render_template('upload.html')
-
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
-
-    file = request.files['file']
-
-    if file.filename == '':
-        return redirect(request.url)
-
-    if file and file.filename.endswith('.json'):
-        try:
-            # Save the uploaded file with a unique name
-            unique_filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(unique_filename)
-
-            # Process the JSON file
-            with open(unique_filename, 'r') as json_file:
-                data = json.load(json_file)
-                # lectures = data["data"]["lectures"]
-                # subClasses = data["data"]["subClasses"]
-                grades = data["data"]["grades"]
-                teachers = data["data"]["teachers"]
-                time_slots = data["data"]["time_slots"]
-                days = data["data"]["days"]
-                lectures = data["data"]["lectures"]
-            # Perform optimization using PuLP
-            check = is_feasible(data, grades, teachers, time_slots, days)
-            if check[0] == False:
-                print(check[1])
-                exit(0)
-            else:
-                print("feasible")
-                print(check[1])
-
-            results = optimize_with_pulp(data, grades, teachers, time_slots, days,lectures)
-
-            # Render the home page with results
-            return render_template('teacher.html', teacher_schedules=teacher_schedules)
-        except json.JSONDecodeError as e:
-            return f"Error decoding JSON: {e}"
-        except Exception as e:
-            return f"An error occurred: {e}"
-
-    return 'Invalid file format. Please upload a JSON file.', 400
-
-
-@app.route('/day')
-def render_day_page():
-    teacher_conflicts = find_teacher_conflicts(schedules_by_day)
-    return render_template('day.html', schedules_by_day=schedules_by_day, days=days, teacher_conflicts=teacher_conflicts)
-
-@app.route('/teacher')
-def render_teacher_page():
-    return render_template('teacher.html', teacher_schedules=teacher_schedules)
-
-@app.route('/schedule')
-def render_schedule_page():
-    return render_template('schedule.html', schedules=schedules)
-
-if __name__ == '__main__':
-    app.run(debug=True)
-            # Define a dictionary to store teacher schedules

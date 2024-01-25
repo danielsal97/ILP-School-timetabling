@@ -1,45 +1,41 @@
 {
     "data": {
-        
         "grades": {
             "A": {
-                "Classroom 1": {
+                "A1": {
 
-                    "Science": 3,
-                    "History": 3,
-                    "geography": 3
+                    "Science": 1,
+                    "History": 1,
+                    "geography": 1
                     
                 },
-                "Classroom 2": {
+                "A2": {
 
-                    "Science": 3,
-                    "History": 3
-                }
-            },
-            "B": {
-                "Classroom 1": {
-
-                    "Science": 2,
-                    "History": 2
-                },
-                "Classroom 2": {
-
-                    "Science": 2,
-                    "History": 2
+                    "Science": 1,
+                    "History": 1
                 }
             }
         },
         "teachers": {
-            "Smith": [30, ["Math", "History", "Science","English"], [ "Friday"],["A", "Classroom 1"]],
-            "Johnson": [30, ["English","Math"], ["Friday", "N"],["A", "Classroom 1"]],
-            "Williams": [30, ["Science", "English", "geography"], ["N"],["A", "Classroom 1"]],
-            "Beri": [30, ["English","Math"], ["Friday"],["A", "Classroom 1"]]
+            "Smith": [16, ["Math", "History", "Science", "English"], [ "Friday", "Monday"]],
+            "Johnson": [16, ["English", "Math", "Science", " History"], ["Friday"]],
+            "Williams": [16, ["Science", "English", "geography", "Math"], [ "N"]]
+        },
 
+
+        "groups":{
+            "A":{
+                "Math":[3,2],
+                "English":[3,2]
+            },
+            "B":{
+                "Math":[3,2],
+                "English":[3,2]
+            }
         },
-        "subClasses":{
-            "English": ["A", "B"],
-            "Math": ["A", "B"]
-        },
+        "lectures": [ "History", "Science",  "geography"],
+        
+        "classroom": ["A1","A2","B1","B2"],
         "time_slots": ["8-9", "9-10", "11-12", "12-13", "12-14", "14-15", "15-16", "16-17"],
         "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     }

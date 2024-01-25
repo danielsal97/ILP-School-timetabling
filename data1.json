@@ -3,52 +3,11 @@
         
         "grades": {
             "ט": {
-                "Classroom 1": {
+                "ט1": {
 
-                    "Math": 4,
-                    "English": 3,
-                    "Science": 3,
-                    "History": 3,
-                    "geography": 3
-                    
-                },
-                "Classroom 2": {
-                    "Math": 3,
-                    "English": 3,
-                    "Science": 3,
-                    "History": 3
-                }
-            },
-            "י": {
-                "Classroom 1": {
-                    "Math": 2,
-                    "English": 2,
-                    "Science": 2,
-                    "History": 2
-                },
-                "Classroom 2": {
-                    "Math": 2,
-                    "English": 2,
-                    "Science": 2,
-                    "History": 2
-                }
-            },
-            "יא": {
-                "Classroom 1": {
-                    "Math": 2,
-                    "English": 2,
-                    "Science": 2,
-                    "History": 2
-                }
-            },
-            "יב": {
-                "Classroom 1": {
-                    "Math": 2,
-                    "English": 2,
-                    "Science": 2,
-                    "History": 2
-                }
-            }
+                    "נביא": [3, "אביבה"]                   
+                }}
+
         },
         "teachers": {
             "אביבה": [25,["נביא", "מתמטיקה", "דינים", " פרה״ש"], [ "Wednesday",  "Friday"]],
@@ -77,8 +36,10 @@
             "תמי": [15,["אזרחות","תורה", "חינוך"],["Tuesday","Thursday"]]
 
         },
-
+        "classroom":["ט1","ט2","י1","י2","יא1","יב1"],
+        "lectures":["מתמטיקה","אנגלית","הבעה","לשון","חינוך","תורה","דינים","יהדות","מוט״ב","ספרות","היסטוריה","פרה״ש","אזרחות","חשבונאות","מנהל וכלכלה","השקפה","אסטראגיות","התעמלות"],
         "time_slots": ["8-9", "9-10", "11-12", "12-13", "12-14", "14-15", "15-16", "16-17"],
-        "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+        "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "groups": ["ט", "י", "יא", "יב"]
     }
 }

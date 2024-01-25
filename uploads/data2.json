@@ -2,48 +2,76 @@
     "data": {
         "grades": {
             "A": {
-                "Classroom 1": {
-                    "Math": 1,
-                    "English": 1,
-                    "Science": 2,
-                    "History": 2,
-                    "geography": 2
+                "A1": {
+
+                    "Science": [3,"Smith"],
+                    "History": [3, "Williams"],
+                    "geography": [3, "Williams"],
+                    "Math": [3, "Smith"],
+                    "Biology": [3, "Williams"],
+                    "Sport": [3, "Miller"],
+                    "Hebrew": [3, "Davis"],
+                    "English": [3, "Smith"],
+                    "Music": [3, "Rodriguez"],
+                    "Drama": [3, "Rodriguez"]
+       
                 },
-                "Classroom 2": {
-                    "Math": 1,
-                    "English": 1,
-                    "Science": 2,
-                    "History": 2
+                "A2": {
+
+                    "Science": [3,"Smith"],
+                    "History": [3, "Williams"],
+                    "geography": [3, "Williams"],
+                    "Math": [3, "Smith"],
+                    "Biology": [3, "Williams"],
+                    "Sport": [3, "Miller"],
+                    "Hebrew": [3, "Davis"],
+                    "English": [3, "Smith"],
+                    "Music": [3, "Rodriguez"],
+                    "Drama": [3, "Rodriguez"]
                 }
             },
             "B": {
-                "Classroom 1": {
-                    "Math": 1,
-                    "English": 1,
-                    "Science": 2,
-                    "History": 2
+                "B1": {
+
+                   "Science": [2,"Taylor"],
+                    "History": [2, "Brown"],
+                    "geography": [2, "Brown"],
+                    "Math": [2, "Johnson"],
+                    "Biology": [2, "Williams"],
+                    "Sport": [2, "Miller"],
+                    "Hebrew": [2, "Davis"],
+                    "English": [2, "Johnson"],
+                    "Music": [3, "Rodriguez"],
+                    "Drama": [3, "Rodriguez"]
+                    
                 },
-                "Classroom 2": {
-                    "Math": 1,
-                    "English": 1,
-                    "Science": 2,
-                    "History": 2
+                "B2": {
+                    "Science": [2,"Taylor"],
+                    "History": [2, "Brown"],
+                    "geography": [2, "Brown"],
+                    "Math": [2, "Johnson"],
+                    "Biology": [2, "Williams"],
+                    "Sport": [2, "Miller"],
+                    "Hebrew": [2, "Davis"],
+                    "English": [2, "Johnson"],
+                    "Music": [3, "Rodriguez"],
+                    "Drama": [3, "Rodriguez"]
+
                 }
             }
         },
         "teachers": {
-            "Smith": [15, ["Math", "History", "Science"], ["N", "Friday"]],
-            "Johnson": [15, ["English"], ["Friday", "N"]],
-            "Williams": [17, ["Science", "English", "geography"], ["N", "N"]]
+            "Smith": [20, [ "Science", "English", "Math"], [ "Friday", "Monday"]],
+            "Johnson": [20, ["Science", "English", "Math"], ["Friday"]],
+            "Williams": [46, ["History", "geography", "Biology"], [ "N"]],
+            "Brown": [46, ["History", "geography"], [ "Friday", "Monday"]],
+            "Miller": [46, ["Sport"], ["Friday"]],
+            "Davis": [46, ["Hebrew"], [ "N"]],
+            "Rodriguez": [46, ["Music", "Drama"], [ "N"]],
+            "Taylor": [16, ["Science", "English", "geography", "Math"], [ "N"]]
         },
-        "lectures":{
-            "Math":[["level 1"],["level 2"]],
-            "English":[["level 1"],["level 2"]],
-            "Science":[["main class"]],
-            "History":[["main class"]],
-            "geography":[["main class"]]
-
-        },
+        "subjects": [ "History", "Science",  "geography", "Math", "English", "Hebrew", "Sport", "Music", "Drama", "Biology"],      
+        "classroom": ["A1","A2","B1","B2"],
         "time_slots": ["8-9", "9-10", "11-12", "12-13", "12-14", "14-15", "15-16", "16-17"],
         "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     }
