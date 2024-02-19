@@ -1,18 +1,18 @@
-#Introduction
+# Introduction
 
 Finding an optimal solution for creating a school timetable is a complex and challenging task. This process involves considering numerous constraints. Manual timetable creation often results in deficiencies, scheduling conflicts, and suboptimal resource utilization. As data scales up, both in terms of volume and constraints, the problem becomes even more daunting. Multiple variables must be adjusted to accommodate the needs of teachers, students, and classrooms.
 In this project, an internet-based model using linear planning was developed to address various constraints and solve the following problem:
 Assigning teachers and lectures according to requirements for multiple grades and classes, while considering various constraints and requirements, to create an efficient and balanced timetable that maximizes resource utilization and minimizes conflicts.
 
 
-#Project Goals:
+# Project Goals:
 Automatic scheduling - The project aims to automate the process of creating school timetables, eliminating the need for manual scheduling efforts. This not only saves time but also reduces the risk of human error.
 Optimization - Using mathematical optimization algorithms, the application aims to optimize resource utilization, such as classroom availability and teacher workload, by allocating resources in the most efficient manner possible.
 Flexible customization - The application will adapt to different scheduling constraints and preferences, making it suitable for a wide range of educational institutions, from elementary schools to universities.
 User-friendly interface - To make the scheduling process accessible to administrators and educators, the project provides an intuitive web interface where users can upload data and view timetables in a convenient and easy-to-understand format.
 
 
-#Solving the Problem Using Linear Planning
+# Solving the Problem Using Linear Planning
 A linear planning problem involves optimizing a linear function subject to linear constraints. In other words, given variables and a set of inequalities between a linear equation involving the variables and constants, the objective is to find the maximum or minimum value of the linear function subject to all the inequalities.
 Integer Linear Programming (ILP) addresses a similar problem to linear planning, but with the additional constraint that variables must have integer values. While a regular linear planning problem can be solved by polynomial algorithms, ILP problems are NP-hard.
 To solve the timetable system problem, several parameters need to be defined: decision variables, objective function, constraints, and the problem definition (i.e., whether to maximize or minimize it).
@@ -81,7 +81,7 @@ To a teacher in teachers:
                 For time in time slots:
                     prob += lpSum ( x [( teacher , lecture , hour , day , class , class )] for teacher in teachers for lecture in lectures ) <= 1
 
-#Project structure:
+# Project structure:
 This project is built from two parts backend and frontend, linked by flask.
 Bottle is a library for web applications written in Python. It provides a simple and flexible tool for developing and building network applications, and it makes for efficient and simple endpoint representation and access.
 The frontend - written in html css and js
@@ -103,7 +103,7 @@ Information and an error occurred will show an error message.
 Otherwise, optimization will be performed by cbc or simplex , info and simplex will fail and try using cbc .
 The system will organize the data and transfer it via flask to the appropriate html pages, where a translation will be made to the time and time system display.
 
-#Technologies and tools:
+# Technologies and tools:
 Python 3 – the main programming language used by the project.
 Flask – a python web framework used to create the backend of the application.
 The pulp library - a library for linear programming that is used to write the constraints and solve them.
