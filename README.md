@@ -1,5 +1,4 @@
 # Introduction
-
 Finding an optimal solution for creating a school timetable is a complex and challenging task. This process involves considering numerous constraints. Manual timetable creation often results in deficiencies, scheduling conflicts, and suboptimal resource utilization. As data scales up, both in terms of volume and constraints, the problem becomes even more daunting. Multiple variables must be adjusted to accommodate the needs of teachers, students, and classrooms.
 In this project, an internet-based model using linear planning was developed to address various constraints and solve the following problem:
 Assigning teachers and lectures according to requirements for multiple grades and classes, while considering various constraints and requirements, to create an efficient and balanced timetable that maximizes resource utilization and minimizes conflicts.
@@ -49,37 +48,6 @@ The PuLP library is a Python library used for building and solving optimization 
 
 With PuLP, you can define variables, objectives (functions of interest), and linear and logical constraints. Once the problem is defined, there are a variety of optimization algorithms that can be used.
 
-In the following code snippet, you can see the definition of the problem, variables, and objective function:
-
-# Define the problem
-prob = LpProblem("School_Scheduling", LpMaximize)
-
-# Set the decision variables
-x = LpVariable.dicts("x", [(teacher, subject, time_slot, day, class, grade) for teacher in teachers for class in grades for class in classes for subject in subjects for time_slot in time_slots for day in days], cat='binary')
-
-# Define the objective function
-prob += lpSum(x)
-
-In this section, you can find several example constraints:
-
-for day in days:
-    for time_slot in time_slots:
-        for teacher in teachers:
-            # Teacher can only teach one subject at a time
-            prob += lpSum(x[(teacher, subject, hour, day, class, grade)] for class in grades for class in classes for subject in subjects) <= 1
-
-
-To a teacher in teachers:
-    Mother day in teachers [ teacher ][ 2 ]:
-        For time in time slots:
-            One teacher has days off
-            prob += lpSum (x [(teacher, lecture, hour, day, class, class)] for class in grades for class in classes for lecture in lectures) == 0
-
-    For the class in grades:
-        For class B classrooms:
-            If grade in grades [ grade ]:
-                For time in time slots:
-                    prob += lpSum ( x [( teacher , lecture , hour , day , class , class )] for teacher in teachers for lecture in lectures ) <= 1
 
 # Project structure:
 This project is built from two parts backend and frontend, linked by flask.
