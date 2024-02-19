@@ -1,191 +1,115 @@
+#Introduction
 
+Finding an optimal solution for creating a school timetable is a complex and challenging task. This process involves considering numerous constraints. Manual timetable creation often results in deficiencies, scheduling conflicts, and suboptimal resource utilization. As data scales up, both in terms of volume and constraints, the problem becomes even more daunting. Multiple variables must be adjusted to accommodate the needs of teachers, students, and classrooms.
+In this project, an internet-based model using linear planning was developed to address various constraints and solve the following problem:
+Assigning teachers and lectures according to requirements for multiple grades and classes, while considering various constraints and requirements, to create an efficient and balanced timetable that maximizes resource utilization and minimizes conflicts.
 
-	מבוא 
 
-מציאת פתרון אופטימלי עבור יצירת מערכת שעות בבית הספר הינה בעיה מורכבת וקשה. תהליך זה כרוך בהתחשבות באילוצים רבים. יצירה ידנית של לוחות זמנים מובילה לרוב לחוסר זה , התנגשויות תזמון וניצול לא מיטבי של משאבים . בעיה זו הופכת למאתגרת יותר ככל שהנתונים גדלים, הן מצדם והן מצד האילוצים. משתנים מרובים חייבים להתאים לצרכים של מורים, תלמידים וכיתות.
-בפרויקט זה נבנה מודל אינטרנטי המבוסס על תכנון לינארי המסוגל להתמודד עם אילוצים שונים על מנת לפתור את הבעיה הבאה :
-יש לשבץ  מורים והרצאות לפי דרישות עבור מספר שכבות וכיתות , תוך התחשבות באילוצים ודרישות שונות , ליצירת לוח זמנים יעיל ומאוזן המקסם את ניצול המשאבים וממזער קונפליקטים .
-	
+#Project Goals:
+Automatic scheduling - The project aims to automate the process of creating school timetables, eliminating the need for manual scheduling efforts. This not only saves time but also reduces the risk of human error.
+Optimization - Using mathematical optimization algorithms, the application aims to optimize resource utilization, such as classroom availability and teacher workload, by allocating resources in the most efficient manner possible.
+Flexible customization - The application will adapt to different scheduling constraints and preferences, making it suitable for a wide range of educational institutions, from elementary schools to universities.
+User-friendly interface - To make the scheduling process accessible to administrators and educators, the project provides an intuitive web interface where users can upload data and view timetables in a convenient and easy-to-understand format.
+
+
+#Solving the Problem Using Linear Planning
+A linear planning problem involves optimizing a linear function subject to linear constraints. In other words, given variables and a set of inequalities between a linear equation involving the variables and constants, the objective is to find the maximum or minimum value of the linear function subject to all the inequalities.
+Integer Linear Programming (ILP) addresses a similar problem to linear planning, but with the additional constraint that variables must have integer values. While a regular linear planning problem can be solved by polynomial algorithms, ILP problems are NP-hard.
+To solve the timetable system problem, several parameters need to be defined: decision variables, objective function, constraints, and the problem definition (i.e., whether to maximize or minimize it).
+The problem entails solving the timetable system for a school, addressing constraints related to working hours, classes, teachers, grades, days, time slots, and subjects. In optimization terms, the objective is to maximize the number of teacher and subject assignments to classes and grades while prioritizing constraints.
+Based on your parameters for ILP troubleshooting.
+Based on the definition, we aim to maximize the results.
+For each teacher (t), subject (s), day (d), hour (h), and class (g), x is defined as a binary variable, taking values of 0 or 1. It equals 1 if teacher t teaches subject s to class g on day d and at hour h, otherwise it equals 0.
+Mathematically, given the sets of teachers (), subjects (), days (), time slots (), classes (), and grades ().
+The decision variable is defined as follows:
 
-מטרות הפרויקט:  
-	תזמון אוטומטי – מטרת הפרויקט היא להפוך את תהליך יצירת לוחות הזמנים של בית הספר לאוטומטיים , ולבטל את צורך במאמצי תזמון ידני . זה לא רק חוסך זמן אלא גם מפחית את הסיכון לטעויות אנוש .
-	אני - באמצעות אלגוריתמי אופטימיזציה מתמטיים , האפליקציה שואפת לייעל את ניצול המשאבים , למשל זמינות בכיתה ועומס העבודה של המורים . היא שואפת להקצות משאבים בצורה היעילה ביותר האפשרית .
-	אפשרויות התאמה רחבה– האפליקציה נודה להתאים לאילוצים והעדפות תזמון שונות , מה שיוצר אותה למתאימה למגוון רחב של מוסדות חינוך , מבתי ספר יסודיים ועד אוניברסיטאות .
-	ממשק משתמש למשתמש – ב כדי להפוך את תהליך התזמון לנגיש למנהלים ולמחנכים , הפרויקט מספק ממשק אינטרנט אינטואיטיבי שבו משתמשים יכולים להעלות נתונים , הצגה מערכות שעות בצורה נוחה וקלה להבנה.   
+Define x: a teacher teaching a subject at a specific day and time, belonging to a class.
+x[teacher, subject, time_slot, day, class, grade] ∈ {0,1}
+Based on defined constraints, it will be assigned 1 when meeting other conditions, otherwise 0.
 
+Now, after defining the decision variables and the problem definition (maximization/minimization), we will construct our functions. That is, we want to maximize the possible assignments function and the constraints function, encompassing all decision variables:
 
+∑_(t∈Teachers,s∈Subjects, ts∈Time_slots, d∈Days, c∈Classes, g∈Grades)▒〖x[t,s,ts,d,c,g]〗
 
-	פתרון הבעיה באמצעות תכנון ליניארי
-בעיית תכנון ליניארי היא בעיית אופטימיזציה של פונקציה ליניארי ת תחתית אילוצים ליניאריים . כלומר , בהינתן משתנים ומערכת של אי - שוויונות בין משוואה ליניארית על הערכים ו קבוע , למצוא את הערך המקסימלי או המינימלי שפונקציה ליניארית משהו יכולה לקבל תחת קיום של כל מערכת האי שוויוני ם .
-תכנון ליניארי בשלמים ( ILP - Integer Linear Programming ) מציין בעיה דומה לבעיית התכנון הליניארי , אלא שהמשתנים חייבים לקבל ערכים שלמים דווקא . אתה לבעיית תכנון ליניארי רגילה שלה יש אלגוריתם פולי נומי הפותר אותה , בעיה זאת היא NP קשה . 
- 
-על מנת לפתור את בעיית המערכת השעות יש להגדיר מספר פרמטרים: משתני החלטה, פונקציית מטרה, אילוצים והגדרת הבעיה כלומר האם נרצה למקסם או לצמצם אותה.
-הבעיה היא נרצה לפתור את מערכת שעות עבור בית ספר. בבעיה זו עלינו לתת פתרון למערכת האילוצים של מערכת השעות עבודה, הכיתות, המורים, השכבות, הימים, משבצות הזמן והמקצועות. בתרגום לבעיית האופטימיזציה, פונקציית יש לנו מיקסום מספר השיבוצים של מורים ומקצועות עבור כיתות ושכבות, תוך כדי מתן חשיבות עבור האילוצים.
-על סמך את הפרמטרים שלך עבור פתרון בעיות ILP .
-על סמך הגדרת ההגדרה נרצה למקסם את התוצאות.
-לכל מורה t , מקצוע s , יום d , שעה h , וכיתה g , מגדירים x , אשר יכול לקבל ערך 0 או ערך 1. המשתנה יקבל ערך 1 אם המורה t מלמד את הכיתה g את המקצוע s ביום ד ובשעה h , אחרת יקבל ערך 1. 0.
-מתמטית, בהינתן קבוצת המורים (), קבוצת המקצועות (), קבוצת הימים(), קבוצות הזמנים(), קבוצת הכיתות() וקבוצת השכבות().
-נגד משתן ההחלטה בדרך הבאה:
 
-נגדיר x המייצג: מורה המלמד מקצוע ביום ושעה ,כיתה השייכת לשכבה
-x[מורה,מקצוע,משבצת_זמן,יום,כיתה,שכבה] ∈ {0,1}			
-על סמך אילוצים שיוגדרו בהמשך נקבל 1 כאשר ערך זה עומד בתנאים אחרים, 0
+Finally, we aim to define the constraints for selecting the optimal assignments.
+Examples of some constraints include:
+- A teacher cannot teach more than one class at the same time and on the same day.
+- A teacher should not exceed the assigned number of hours.
+- Days off can be defined for teachers when they do not teach.
+- Teachers will only teach subjects within their field.
+- The number of lessons for each subject in each class should meet the requirements.
 
-כעת, לאחר שהגדרנו את המשתני ההחלטה ואת הגדרת הבעיה (מקסום / צמצום) נבנה את הפונקציונליות שלנו, כלומר נרצה למקסם את ההשמות האפשריות השעות ולפיכך הפונקציה היא כוללת כל משתני ההחלטה:
+Some constraints are easy to define mathematically (and simpler to program),
+while others are more complex, such as prioritizing early hours to avoid gaps.
 
-∑_(t∈Teachers,s∈s,   ts∈Time_slots,d∈Day,c∈classroom,g∈grades)▒〖x[t,s,ts,d,c,g]〗
+Practically, you can see an implementation in Python using the PuLP library.
 
+The PuLP library is a Python library used for building and solving optimization problems. It aids in solving various mathematical and logical problems, including linear problems, integer variables, and more.
 
+With PuLP, you can define variables, objectives (functions of interest), and linear and logical constraints. Once the problem is defined, there are a variety of optimization algorithms that can be used.
 
+In the following code snippet, you can see the definition of the problem, variables, and objective function:
 
-ולבסוף, נרצה להגדיר את האילוצים שעל פיהם יבחרו ההשמות האופטימליות
-דוגמה  לחלק מהאילוצים:
-	מורה לא יכול ללמד יותר מכיתה אחת באותה שעה ובאותו היום.
-	מורה לא יחרוג כמות השעות שהוא המוקצות לו.
-	ניתן להגדיר ימי חופש למורה, בהם המורה לא מלמד.
-	מורה ילמד רק מקצועות החוק.
-	מספר השיעורים עבור כל מקצוע בכל כיתה יהיה על פי הדרישות.
+# Define the problem
+prob = LpProblem("School_Scheduling", LpMaximize)
 
-יש אילוצים שקל להגדיר מתמטית (ופשוטים יותר לתכנות)
-∑_(t∈Teachers,   l∈Lectures,c∈Classroom,g∈Grade) x[t,l,ts,d,c,g] 
+# Set the decision variables
+x = LpVariable.dicts("x", [(teacher, subject, time_slot, day, class, grade) for teacher in teachers for class in grades for class in classes for subject in subjects for time_slot in time_slots for day in days], cat='binary')
 
-וישנם אילוצים מורכבים יותר למי דול מתמטי כמו עדיפות לשעות מוקדמות, כך שלא יהיו חלונות.
+# Define the objective function
+prob += lpSum(x)
 
+In this section, you can find several example constraints:
 
+for day in days:
+    for time_slot in time_slots:
+        for teacher in teachers:
+            # Teacher can only teach one subject at a time
+            prob += lpSum(x[(teacher, subject, hour, day, class, grade)] for class in grades for class in classes for subject in subjects) <= 1
 
 
+To a teacher in teachers:
+    Mother day in teachers [ teacher ][ 2 ]:
+        For time in time slots:
+            One teacher has days off
+            prob += lpSum (x [(teacher, lecture, hour, day, class, class)] for class in grades for class in classes for lecture in lectures) == 0
 
+    For the class in grades:
+        For class B classrooms:
+            If grade in grades [ grade ]:
+                For time in time slots:
+                    prob += lpSum ( x [( teacher , lecture , hour , day , class , class )] for teacher in teachers for lecture in lectures ) <= 1
 
+#Project structure:
+This project is built from two parts backend and frontend, linked by flask.
+Bottle is a library for web applications written in Python. It provides a simple and flexible tool for developing and building network applications, and it makes for efficient and simple endpoint representation and access.
+The frontend - written in html css and js
+On the user page, the user must upload a json file and he will receive 3 views of the time system. Display of teachers, classes/layers and days.
+Shown can examine the various aspects.
+An example of the file structure:
+Grades - contains the requirements, which layers and classes exist in it, in addition which subjects are studied, how many time slots for each of them and who is the teacher who teaches them.
+Teachers - an array containing the maximum number of weekly hours for a teacher, subjects he teaches, and days off he will not teach.
+Lectures - an array of subjects
+Classroom - an array of classrooms
+Time_slots – an array of times
+Days - an array of days
 
+After uploading a file, you will receive the following views:
 
+The backend is written in python
+Its function is to read the data of the Json file and performs preliminary checks for the input in order to save running time, for example the number of study hours the lecturer received does not exceed the maximum registered to him.
+Information and an error occurred will show an error message.
+Otherwise, optimization will be performed by cbc or simplex , info and simplex will fail and try using cbc .
+The system will organize the data and transfer it via flask to the appropriate html pages, where a translation will be made to the time and time system display.
 
+#Technologies and tools:
+Python 3 – the main programming language used by the project.
+Flask – a python web framework used to create the backend of the application.
+The pulp library - a library for linear programming that is used to write the constraints and solve them.
+CBC solver - open source ILP solver, used by default in the pulp library
+GLPK - an external solver used for optimization tasks, part of an open source library that provides for solving LP and ILP problems using simplex
+Use of HTML, CSS, JAVASCRIPT languages
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-באופן מעשי ניתן לראות מימוש ב python באמצעות ספריית pulp
-
-ספריית Pulp היא ספרייה בשפת python שמשמשת לבניית ופתרון בעיות אופטימיזציה. היא מסייעת בפתרון מגוון רחב של בעיות מתמטיות ולוגיות, בעיות ליניאריות, משתנים שלמים, ועוד .
-
-עם Pulp , ניתן להגדיר משתנים, אובייקטיבים (פונקציית עניין), ומגבלות ליניאריות ולוגיות. לאחר הגדרת הבעיה, כמו כן יש מגוון אלגוריתמי אופטימיזציה אשר ניתן להשתמש .
-
-בקוד הבא אנו רואים את הגדרת הבעיה, הגדרת המשתנים, ופונקציית המטרה.
-     # תגדיר את הבעיה
-    prob = LpProblem ( "School_Scheduling" , LpMaximize )
-   
-    # הגדר את משתני ההחלטה
-    איקס = LpVariable . dicts ( "x" , [( מורה , הרצאה , משבצת זמן , יום , כיתה , כיתה ) עבור מוֹרֶה  ב מורים ל כיתה ב ציוני ל כיתה ב כיתות ל הַרצָאָה ב הרצאות ל מרווח זמן ב חריצי זמן ל יְוֹם ב days ], cat = 'בינארי' )
-    # הגדר את פונקציית המטרה כאן
-    prob += lpsum ( x )
-    
-
-בחלק זה ניתן לראות מספר אילוצים לדוגמה
-    ל יְוֹם ב ימים :
-        ל זְמַן  ב חריצי זמן :
-            ל מוֹרֶה ב מורים :
-                # מורה יכול ללמד רק הרצאה אחת בכל פעם
-                prob += lpSum ( x [( מורה , הרצאה , שעה , יום , כיתה , כיתה )] עבור כיתה ב ציוני ל כיתה ב כיתות ל הַרצָאָה ב הרצאות ) <= 1
-
-        ל מוֹרֶה ב מורים :
-            אם יְוֹם ב מורים [ מורה ][ 2 ]:
-                ל זְמַן ב חריצי זמן :
-                    למורה אחד יש ימי חופש
-                    prob += lpSum ( x [( מורה , הרצאה , שעה , יום , כיתה , כיתה )] עבור כיתה ב ציוני ל כיתה ב כיתות ל הַרצָאָה ב הרצאות ) == 0
-    
-        ל כיתה ב ציוני :
-            ל כיתה ב כיתות לימוד :
-                אם כיתה ב ציונים [ כיתה ]:
-                    ל זְמַן ב חריצי זמן :
-                        prob += lpSum ( x [( מורה , הרצאה , שעה , יום , כיתה , כיתה )] עבור מוֹרֶה ב מורים ל הַרצָאָה ב הרצאות ) <= 1
-
-
-
-
-	מבנה הפרויקט :
-פרויקט זה בנוי משני חלקים backend ו- frontend , המקושרים על ידי flask .
-בקבוק היא ספרייה ליישומי אינטרנט שנכתבה ב- פיתון . היא מספקת כלי פשוט וגמיש לפיתוח ובניית אפליקציות רשת, והיא מעשהת בייצוג והגעת נקודות קצה יעילה ופשוטה.
-ה- fronted - נכתב ב html css ו- js 
-בדף משתמש על המשתמש להעלות קובץ json יו יקבל 3 תצוגות של מערכת שעות. תצוגת מורים, כיתות/שכבות וימים.
-מוצג יכול לבחון את ההיבטים שונים.
-דוגמה למבנה הקובץ:
-Grades – מכיל בתוכו את הדרישות, אילו שכבות וכיתות קיימות בו, בנוסף אילו מקצועות מלומדים , כמה משבצות זמן עבור כל אחד מהם ומי המורה המלמד אותם.
-מורים - מערך המכיל את מספר השעות השבועיות המקסימליות עבור מורה, מקצועות שהוא מלמד, וימי חופש גורם הוא לא ילמד.
-הרצאות – מערך של מקצועות
-Classroom – מערך של כיתות
-Time_slots – מערך של זמנים
-ימים – מערך של ימים
-
-
-	לאחר העלאת קובץ יתקבלו התצוגות הבאות:
- 
- 
- 
-
-
-
-הקצה האחורי נכתב ב python 
-תפקידו הוא לקרוא את הדאטה של קובץ ה- Json מבצע בדיקות מקדימות עבור הקלט על מנת לחסוך זמן ריצה, למשל מספר שעות הלימוד שהמרצה קיבלה לא חורג מהמקסימום הרשום לו.
-מידע וקרתה שגיאה תראה הודעת שגיאה.
-אחרת, יתבצע אופטימיזציה על ידי cbc או סימפלקס , מידע וסימפלקס ייכשל ינסה באמצעות cbc .
-המערכת תארגן את הדאטה ותעביר זאת באמצעות flask לדפי ה html המתאימה, ששם יבוצע תרגום לידי בלאות ותצוגת מערכת השעות.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	טכנולוגיות וכלים:
-	Python 3 – שפת התכנות המרכזית המשמשת את הפרויקט.
-	Flask – מסגרת אינטרנט של python המשמשת ליצירת הקצה האחורי של האפליקציה.
-	ספריית pulp – ספרייה לתכנות לינארי המשמשת לכתיבת האילוצים ולפתירתם.
-	CBC solver – פוותר ILP בקוד פתוח, משמש כברירת מחדל ב ספריית pulp
-	פותר GLPK – פותר חיצוני המשמש למשימות אופטימיזציה, חלק מספריית קוד פתוח המספק לפתרון בעיות LP ו- ILP משתמש בסימפלקס
-	שימוש בשפות HTML, CSS ,JAVASCRIPT
-
-	סיכו ם:
-פרויקט זה היה מאתגר  מאוד . למדתי איך לקחת בעיה מחיי היום יום, לתרגם למודל מתמטי ולפתור באמצעות אותה תכנון לינארי , כמו כן למדתי איך לעבוד עם שפות שונות ולמשק אותם יחד, חקרתי נושא חדש ללא ידע מוקדם , עבדתי עם סביבות שונות ואיחדתי אותם על מנת שיעבדו יחדיו.
-הקושי המרכזי בפרויקט הוא ביצוע ולידציה עבור הארגון, לפי מספר אפשרויות של תשובות נכונות , כמו כן בעת הגדרת האילוצים יש לשים שהאילוצים אינם סותרים אחד את השני.
-יש להגדיר בצורה מדויקת את הבעיה היא רצינו לפתור ובכך ניתן להגדיר את הפונקציה בצורה מיטבית.
-
-מסקנות :
-	הפרויקט מור עזר לוח בפתרון בעיות רבות וכבות הנקשרות ליצירת זמנים בבתי הספר. המערכת יכולה להיות מותאמת למגוון רחב של מוסדות חינוך .
-	שימוש בטכנולוגיות מתקדמות כמו Flask, Pulp ו– GLPK Solver תורם לפרויקט ביצירת ממשק ובפתרון אופטימיזציה מתמטית יעילה .
-	הפרויקט יכול לחשב בבתי העסק תזמון השעות, לחסוך זמן ומאמץ אנושי ולהפוך את זה למשימה פשוטה ומהירה .
-	ממשק משתמש הידידותי האפשרי למנהלי בתי הספר עובדים ולהיות ביציבה מעולה על מערכת השעות ולקבוע את הלוחות הזמנים בצורה יעילה .
-סיכום זה משקף את הרווח והרווחה הגדולה שבמערכת השעות האוטומטית שמתכוונת לספק. הפרויקט מביא לפתרון יעיל ומתמטי שמאפשר להתקדם התזמון בתי ומציע פתרון מתקדם לבעיות להקצאת משאבים בצורה אופטימלית .
-# final_project
