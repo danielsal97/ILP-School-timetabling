@@ -1,3 +1,15 @@
+### Getting Started
+
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/school-timetable-optimizer.git
+    cd school-timetable-optimizer
+    ```
+2. **Run the application:**
+Start the application by running the main Python script.
+```bash
+python3 main.py
+```
 # Introduction
 Finding an optimal solution for creating a school timetable is a complex and challenging task. This process involves considering numerous constraints. Manual timetable creation often results in deficiencies, scheduling conflicts, and suboptimal resource utilization. As data scales up, both in terms of volume and constraints, the problem becomes even more daunting. Multiple variables must be adjusted to accommodate the needs of teachers, students, and classrooms.
 In this project, an internet-based model using linear planning was developed to address various constraints and solve the following problem:
