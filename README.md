@@ -1,10 +1,10 @@
 ### Getting Started
 
 1. **Clone the repository:**
-    ```bash
+```bash
     git clone [https://github.com/your-username/school-timetable-optimizer.git](https://github.com/danielsal97/ILP-School-timetabling.git
     cd school-timetable-optimizer
-    ```
+```
 2. **Run the application:**
 Start the application by running the main Python script.
 ```bash
